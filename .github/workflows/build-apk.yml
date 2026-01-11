@@ -22,7 +22,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          python3-pip \
           build-essential \
           git \
           zip \
@@ -37,10 +36,11 @@ jobs:
           libtinfo5 \
           cmake \
           libffi-dev \
-          libssl-dev
-        pip3 install --upgrade pip
-        pip3 install --upgrade buildozer
-        pip3 install --upgrade cython
+          libssl-dev \
+          python3-setuptools \
+          python3-dev
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install buildozer cython==0.29.36
 
     - name: Cache Buildozer dependencies
       uses: actions/cache@v4
