@@ -148,9 +148,14 @@ class LogViewer(FloatLayout):
 
         title = Label(
             text="📋 Watering Log",
-            font_size='32sp',
+            font_size='30sp',
             bold=True,
             color=NAVY,
+            size_hint=(0.9, None),
+            height=80,
+            text_size=(Window.width * 0.9, None),
+            halign='center',
+            valign='middle',
             pos_hint={'center_x': 0.5, 'top': 0.98}
         )
         self.add_widget(title)
@@ -233,53 +238,72 @@ class RoomSelectScreen(FloatLayout):
 
         title = Label(
             text="Choose Your Room",
-            font_size='48sp',
+            font_size='44sp',
             bold=True,
             color=GOLD,
+            size_hint=(0.9, None),
+            height=80,
+            text_size=(Window.width * 0.9, None),
+            halign='center',
+            valign='middle',
             pos_hint={'center_x': 0.5, 'center_y': 0.85}
         )
         self.add_widget(title)
 
         subtitle = Label(
             text="Select a room to water your plants",
-            font_size='20sp',
+            font_size='18sp',
             color=CREAM,
+            size_hint=(0.9, None),
+            height=40,
+            text_size=(Window.width * 0.9, None),
+            halign='center',
+            valign='middle',
             pos_hint={'center_x': 0.5, 'center_y': 0.77}
         )
         self.add_widget(subtitle)
 
         kitchen_btn = Button(
             text="🌿 Kitchen",
-            font_size='32sp',
+            font_size='28sp',
             bold=True,
             size_hint=(0.75, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.60},
             background_color=DEEP_GREEN,
-            color=CREAM
+            color=CREAM,
+            text_size=(Window.width * 0.7, None),
+            halign='center',
+            valign='middle'
         )
         kitchen_btn.bind(on_release=lambda x: self.select_room("Kitchen"))
         self.add_widget(kitchen_btn)
 
         office_btn = Button(
             text="💼 Office",
-            font_size='32sp',
+            font_size='28sp',
             bold=True,
             size_hint=(0.75, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.45},
             background_color=GOLD,
-            color=NAVY
+            color=NAVY,
+            text_size=(Window.width * 0.7, None),
+            halign='center',
+            valign='middle'
         )
         office_btn.bind(on_release=lambda x: self.select_room("Office"))
         self.add_widget(office_btn)
 
         bedroom_btn = Button(
             text="🛏️ Bedroom",
-            font_size='32sp',
+            font_size='28sp',
             bold=True,
             size_hint=(0.75, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.30},
             background_color=DEEP_GREEN,
-            color=CREAM
+            color=CREAM,
+            text_size=(Window.width * 0.7, None),
+            halign='center',
+            valign='middle'
         )
         bedroom_btn.bind(on_release=lambda x: self.select_room("Bedroom"))
         self.add_widget(bedroom_btn)
@@ -338,9 +362,14 @@ class PlantCard(FloatLayout):
 
         instructions = Label(
             text="⬅️ SWIPE LEFT = WATER  |  SWIPE RIGHT = SKIP ➡️",
-            font_size='20sp',
+            font_size='18sp',
             color=NAVY,
             bold=True,
+            size_hint=(0.9, None),
+            height=60,
+            text_size=(Window.width * 0.85, None),
+            halign='center',
+            valign='middle',
             pos_hint={'center_x': 0.5, 'center_y': 0.90}
         )
         self.add_widget(instructions)
@@ -358,21 +387,32 @@ class PlantCard(FloatLayout):
         except Exception as e:
             print(f"Could not load image {plant_info['img']}: {e}")
 
-        # Plant name
-        self.add_widget(Label(
+        # Plant name - with text wrapping
+        plant_name = Label(
             text=plant_info['name'],
-            font_size='28sp',
+            font_size='24sp',
             bold=True,
             color=NAVY,
+            size_hint=(0.9, None),
+            height=70,
+            text_size=(Window.width * 0.85, None),
+            halign='center',
+            valign='middle',
             pos_hint={'center_x': 0.5, 'center_y': 0.22}
-        ))
+        )
+        self.add_widget(plant_name)
 
         # Room label
         self.add_widget(Label(
             text=f"📍 {plant_info['room']}",
-            font_size='22sp',
+            font_size='20sp',
             color=GOLD,
             bold=True,
+            size_hint=(0.9, None),
+            height=30,
+            text_size=(Window.width * 0.85, None),
+            halign='center',
+            valign='middle',
             pos_hint={'center_x': 0.5, 'center_y': 0.15}
         ))
 
@@ -565,9 +605,12 @@ class PlantTinderApp(App):
         self.boss = Button(
             text="💀 BOSS LEVEL! 💀\n\nYou skipped 3 plants!\n\nTap to continue",
             background_color=(0.85, 0.1, 0.1, 0.97),
-            font_size='38sp',
+            font_size='32sp',
             bold=True,
-            color=CREAM
+            color=CREAM,
+            text_size=(Window.width * 0.9, None),
+            halign='center',
+            valign='middle'
         )
         self.boss.bind(on_release=self.clear_boss)
         self.root.add_widget(self.boss)
@@ -608,9 +651,14 @@ class PlantTinderApp(App):
 
             completion_msg = Label(
                 text=f"🎉 {self.current_room}\nCOMPLETE! 🎉",
-                font_size='44sp',
+                font_size='40sp',
                 bold=True,
                 color=GOLD,
+                size_hint=(0.9, None),
+                height=150,
+                text_size=(Window.width * 0.9, None),
+                halign='center',
+                valign='middle',
                 pos_hint={'center_x': 0.5, 'center_y': 0.5}
             )
             self.root.add_widget(completion_msg)
