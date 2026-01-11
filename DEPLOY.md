@@ -3,7 +3,7 @@
 ## Step 1: Create GitHub Repository (2 minutes)
 
 1. Go to https://github.com/new
-2. Repository name: `plant-tinder` (or any name you like)
+2. Repository name: `plants-the-game` (or any name you like)
 3. Set to **Private** (recommended, since it has personal plant photos)
 4. Click "Create repository"
 
@@ -21,10 +21,10 @@ git init
 git add .
 
 # Commit
-git commit -m "Initial commit - Plant Tinder app"
+git commit -m "Initial commit - Plants the Game app"
 
 # Link to your GitHub repo (REPLACE 'YOUR-USERNAME' with your actual GitHub username)
-git remote add origin https://github.com/YOUR-USERNAME/plant-tinder.git
+git remote add origin https://github.com/YOUR-USERNAME/plants-the-game.git
 
 # Push to GitHub
 git branch -M main
@@ -42,7 +42,7 @@ git push -u origin main
 
 1. Once the build completes, click on the completed workflow
 2. Scroll down to **"Artifacts"**
-3. Download **"plant-tinder-apk"**
+3. Download **"plants-the-game-apk"**
 4. Extract the ZIP file - you'll find the APK inside
 
 ## Step 5: Install on Pixel 7

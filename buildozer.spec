@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = Plant Tinder
+title = Plants the Game
 
 # (str) Package name
-package.name = planttinder
+package.name = plantsthegame
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = com.sampleplants

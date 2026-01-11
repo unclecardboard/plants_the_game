@@ -1,4 +1,4 @@
-# Plant Tinder - Gamified Plant Care App
+# Plants the Game - Gamified Plant Care App
 
 A swipe-based mobile application for tracking plant watering with room selection, explosions, and boss levels!
 
@@ -209,7 +209,7 @@ buildozer android deploy run
 Use `adb` to access:
 ```bash
 adb shell
-cd /sdcard/Android/data/com.sampleplants.planttinder/files/
+cd /sdcard/Android/data/com.sampleplants.plantsthegame/files/
 ```
 
 ## Performance Notes

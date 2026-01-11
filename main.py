@@ -444,7 +444,7 @@ class PlantCard(FloatLayout):
         anim.start(self)
 
 # --- MAIN APP ---
-class PlantTinderApp(App):
+class PlantsTheGameApp(App):
     def build(self):
         self.root = FloatLayout()
         self.deck = []
@@ -694,4 +694,4 @@ class PlantTinderApp(App):
             self.bg_music.play()
 
 if __name__ == '__main__':
-    PlantTinderApp().run()
+    PlantsTheGameApp().run()

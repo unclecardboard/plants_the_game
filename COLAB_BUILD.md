@@ -20,7 +20,7 @@ Click this link to open the notebook directly in Google Colab:
 
 1. Look for the **Files** folder icon on the left sidebar (📁)
 2. Navigate to `plants_the_game/bin/`
-3. You'll see a file like `planttinder-1.0.0-arm64-v8a-debug.apk`
+3. You'll see a file like `plantsthegame-1.0.0-arm64-v8a-debug.apk`
 4. Right-click it → **Download**
 
 ## Step 4: Install on Pixel 7

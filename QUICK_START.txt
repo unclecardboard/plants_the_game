@@ -1,5 +1,5 @@
 ===========================================
-PLANT TINDER - QUICK DEPLOYMENT STEPS
+PLANTS THE GAME - QUICK DEPLOYMENT STEPS
 ===========================================
 
 Everything is ready! Just follow these 3 steps:
@@ -7,7 +7,7 @@ Everything is ready! Just follow these 3 steps:
 STEP 1: Create GitHub Repository (2 min)
 -----------------------------------------
 1. Go to: https://github.com/new
-2. Repository name: plant-tinder
+2. Repository name: plants-the-game
 3. Make it PRIVATE (has your photos)
 4. Click "Create repository"
 
@@ -18,9 +18,9 @@ Open Command Prompt or Git Bash in this folder and run:
 
 cd "C:\Users\info.DESKTOP-EAL10AV\OneDrive\Documents\Sam_Plants"
 
-git commit -m "Plant Tinder app - ready to build"
+git commit -m "Plants the Game app - ready to build"
 
-git remote add origin https://github.com/YOUR-USERNAME/plant-tinder.git
+git remote add origin https://github.com/YOUR-USERNAME/plants-the-game.git
    (Replace YOUR-USERNAME with your actual GitHub username!)
 
 git branch -M main
@@ -34,7 +34,7 @@ STEP 3: Download APK (30 min wait)
 2. Click "Actions" tab
 3. Wait for build to complete (green checkmark)
 4. Click the completed build
-5. Download "plant-tinder-apk" artifact
+5. Download "plants-the-game-apk" artifact
 6. Extract the ZIP - you'll find the APK inside!
 
 
