@@ -20,7 +20,7 @@ version = 1.0.0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==2.2.1,android,pyjnius
+requirements = python3,kivy,android
 
 # (str) Supported orientation (one of landscape, sensorLandscape, portrait or sensorPortrait)
 orientation = portrait
@@ -38,12 +38,13 @@ warn_on_root = 1
 
 # Android specific
 android.permissions = VIBRATE
-android.api = 33
-android.minapi = 26
-android.sdk = 33
+android.api = 31
+android.minapi = 21
 android.ndk = 25b
 android.archs = arm64-v8a
 android.accept_sdk_license = True
+android.skip_update = False
+android.gradle_dependencies =
 
 # (str) Android entry point, default is ok for Kivy-based app
 #android.entrypoint = org.kivy.android.PythonActivity

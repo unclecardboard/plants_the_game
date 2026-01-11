@@ -20,28 +20,27 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install --upgrade pip
-        pip install buildozer cython==0.29.33
         sudo apt-get update
         sudo apt-get install -y \
           python3-pip \
           build-essential \
           git \
-          ffmpeg \
-          libsdl2-dev \
-          libsdl2-image-dev \
-          libsdl2-mixer-dev \
-          libsdl2-ttf-dev \
-          libportmidi-dev \
-          libswscale-dev \
-          libavformat-dev \
-          libavcodec-dev \
-          zlib1g-dev \
-          libgstreamer1.0-dev \
-          gstreamer1.0-plugins-base \
-          gstreamer1.0-plugins-good \
+          zip \
+          unzip \
           openjdk-17-jdk \
-          unzip
+          autoconf \
+          libtool \
+          pkg-config \
+          zlib1g-dev \
+          libncurses5-dev \
+          libncursesw5-dev \
+          libtinfo5 \
+          cmake \
+          libffi-dev \
+          libssl-dev
+        pip3 install --upgrade pip
+        pip3 install --upgrade buildozer
+        pip3 install --upgrade cython
 
     - name: Cache Buildozer dependencies
       uses: actions/cache@v4
