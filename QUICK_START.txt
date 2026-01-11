@@ -1,0 +1,50 @@
+===========================================
+PLANT TINDER - QUICK DEPLOYMENT STEPS
+===========================================
+
+Everything is ready! Just follow these 3 steps:
+
+STEP 1: Create GitHub Repository (2 min)
+-----------------------------------------
+1. Go to: https://github.com/new
+2. Repository name: plant-tinder
+3. Make it PRIVATE (has your photos)
+4. Click "Create repository"
+
+
+STEP 2: Push Code to GitHub (1 min)
+------------------------------------
+Open Command Prompt or Git Bash in this folder and run:
+
+cd "C:\Users\info.DESKTOP-EAL10AV\OneDrive\Documents\Sam_Plants"
+
+git commit -m "Plant Tinder app - ready to build"
+
+git remote add origin https://github.com/YOUR-USERNAME/plant-tinder.git
+   (Replace YOUR-USERNAME with your actual GitHub username!)
+
+git branch -M main
+
+git push -u origin main
+
+
+STEP 3: Download APK (30 min wait)
+-----------------------------------
+1. Go to your GitHub repo
+2. Click "Actions" tab
+3. Wait for build to complete (green checkmark)
+4. Click the completed build
+5. Download "plant-tinder-apk" artifact
+6. Extract the ZIP - you'll find the APK inside!
+
+
+STEP 4: Install on Pixel 7
+---------------------------
+1. Copy APK to phone (USB or Google Drive)
+2. Open the APK file on phone
+3. Allow installation from unknown sources
+4. Install and enjoy!
+
+===========================================
+
+See DEPLOY.md for detailed instructions and troubleshooting.
