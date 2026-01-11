@@ -42,6 +42,7 @@ android.api = 31
 android.minapi = 21
 android.ndk = 25b
 android.archs = arm64-v8a
+android.arch = arm64-v8a
 android.accept_sdk_license = True
 android.skip_update = False
 android.gradle_dependencies =
@@ -51,9 +52,6 @@ android.gradle_dependencies =
 
 # (bool) Copy library instead of making a libpymodules.so
 android.copy_libs = 1
-
-# (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
-# android.arch = arm64-v8a
 
 # Asset inclusion
 source.include_patterns = assets/*,*.py
