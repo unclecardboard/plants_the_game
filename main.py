@@ -22,32 +22,83 @@ GOLD = (0.79, 0.66, 0.38, 1)
 CREAM = (0.96, 0.91, 0.85, 1)
 DEEP_GREEN = (0.17, 0.37, 0.18, 1)
 LIGHT_GOLD = (0.90, 0.82, 0.63, 1)
+# Urgency colors
+URGENCY_GREEN = (0.22, 0.71, 0.29, 1)  # Good - recently watered
+URGENCY_YELLOW = (1.0, 0.76, 0.03, 1)  # Warning - due soon
+URGENCY_RED = (0.90, 0.16, 0.22, 1)    # Critical - overdue
 
 # --- PLANT DATA ---
 PLANT_DECK_MASTER = [
-    {"name": "Shitty Little Window Plant", "room": "Bedroom", "img": "window.png"},
-    {"name": "The Plant in the Llama", "room": "Bedroom", "img": "llama_icon.png"},
-    {"name": "Dracaena Fragrans (Desk)", "room": "Office", "img": "dracaena_f.png"},
-    {"name": "Dracaena Marginata (Stand)", "room": "Office", "img": "dracaena_m.png"},
-    {"name": "Pothos (Stand)", "room": "Office", "img": "pothos.png"},
-    {"name": "Spider Plant #2", "room": "Office", "img": "spider_2.png"},
-    {"name": "Heartleaf Philodendron (Stand)", "room": "Office", "img": "philodendron_h.png"},
-    {"name": "Monstera Stand #1", "room": "Office", "img": "monstera_stand_1.png"},
-    {"name": "Monstera Stand #2", "room": "Office", "img": "monstera_stand_2.png"},
-    {"name": "Monstera Deliciosa (Large Window)", "room": "Office", "img": "monstera_large.png"},
-    {"name": "Monstera Deliciosa (Bookshelf)", "room": "Office", "img": "monstera_shelf.png"},
-    {"name": "Heartleaf Philodendron (Hanging)", "room": "Office", "img": "philodendron_hang.png"},
-    {"name": "Heartleaf Philodendron (Hanging) #2", "room": "Office", "img": "philodendron_hang.png"},
-    {"name": "Terrarium (Desk)", "room": "Office", "img": "terrarium.png"},
-    {"name": "Snake Plant #1", "room": "Office", "img": "snake_1.png"},
-    {"name": "Snake Plant #2", "room": "Office", "img": "snake_2.png"},
-    {"name": "Ponytail Palm", "room": "Kitchen", "img": "ponytail.png"},
-    {"name": "Heartleaf Philodendron (Hanging)", "room": "Kitchen", "img": "philodendron_hang.png"},
-    {"name": "Spider Plant #1 (Counter)", "room": "Kitchen", "img": "spider_1.png"},
-    {"name": "Butt Plant", "room": "Kitchen", "img": "butt.png"},
-    {"name": "Cactus", "room": "Kitchen", "img": "cactus.png"},
-    {"name": "Little Plant We Hate", "room": "Kitchen", "img": "hate.png"}
+    {"name": "Shitty Little Window Plant", "room": "Bedroom", "img": "window.png", "interval": 7},
+    {"name": "The Plant in the Llama", "room": "Bedroom", "img": "llama_icon.png", "interval": 7},
+    {"name": "Dracaena Fragrans (Desk)", "room": "Office", "img": "dracaena_f.png", "interval": 10},
+    {"name": "Dracaena Marginata (Stand)", "room": "Office", "img": "dracaena_m.png", "interval": 10},
+    {"name": "Pothos (Stand)", "room": "Office", "img": "pothos.png", "interval": 7},
+    {"name": "Spider Plant #2", "room": "Office", "img": "spider_2.png", "interval": 7},
+    {"name": "Heartleaf Philodendron (Stand)", "room": "Office", "img": "philodendron_h.png", "interval": 7},
+    {"name": "Monstera Stand #1", "room": "Office", "img": "monstera_stand_1.png", "interval": 7},
+    {"name": "Monstera Stand #2", "room": "Office", "img": "monstera_stand_2.png", "interval": 7},
+    {"name": "Monstera Deliciosa (Large Window)", "room": "Office", "img": "monstera_large.png", "interval": 7},
+    {"name": "Monstera Deliciosa (Bookshelf)", "room": "Office", "img": "monstera_shelf.png", "interval": 7},
+    {"name": "Heartleaf Philodendron (Hanging)", "room": "Office", "img": "philodendron_hang.png", "interval": 7},
+    {"name": "Heartleaf Philodendron (Hanging) #2", "room": "Office", "img": "philodendron_hang.png", "interval": 7},
+    {"name": "Terrarium (Desk)", "room": "Office", "img": "terrarium.png", "interval": 10},
+    {"name": "Snake Plant #1", "room": "Office", "img": "snake_1.png", "interval": 14},
+    {"name": "Snake Plant #2", "room": "Office", "img": "snake_2.png", "interval": 14},
+    {"name": "Ponytail Palm", "room": "Kitchen", "img": "ponytail.png", "interval": 14},
+    {"name": "Heartleaf Philodendron (Hanging)", "room": "Kitchen", "img": "philodendron_hang.png", "interval": 7},
+    {"name": "Spider Plant #1 (Counter)", "room": "Kitchen", "img": "spider_1.png", "interval": 7},
+    {"name": "Butt Plant", "room": "Kitchen", "img": "butt.png", "interval": 14},
+    {"name": "Cactus", "room": "Kitchen", "img": "cactus.png", "interval": 14},
+    {"name": "Little Plant We Hate", "room": "Kitchen", "img": "hate.png", "interval": 7}
 ]
+
+# --- HELPER FUNCTIONS ---
+def get_last_watered_date(plant_name, log_file):
+    """Get the last date a plant was watered from log file"""
+    if not os.path.exists(log_file):
+        return None
+
+    try:
+        with open(log_file, "r") as f:
+            lines = f.readlines()
+
+        # Search backwards for most recent watering
+        for line in reversed(lines):
+            if plant_name in line and "WATERED" in line:
+                # Parse date: [YYYY-MM-DD HH:MM]
+                date_str = line.split(']')[0].strip('[')
+                return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+        return None
+    except:
+        return None
+
+def calculate_urgency(plant_info, log_file):
+    """Calculate urgency level for a plant
+    Returns: (days_since_watered, urgency_color, urgency_text, urgency_score)
+    urgency_score is used for sorting (higher = more urgent)
+    """
+    last_watered = get_last_watered_date(plant_info['name'], log_file)
+    interval = plant_info.get('interval', 7)
+
+    if last_watered is None:
+        # Never watered - highest urgency
+        return (999, URGENCY_RED, "Never watered", 999)
+
+    days_since = (datetime.datetime.now() - last_watered).days
+    percentage = (days_since / interval) * 100
+
+    if percentage >= 100:
+        # Overdue
+        return (days_since, URGENCY_RED, f"OVERDUE ({days_since}d)", days_since)
+    elif percentage >= 50:
+        # Due soon
+        days_until = interval - days_since
+        return (days_since, URGENCY_YELLOW, f"Due in {days_until}d", days_since)
+    else:
+        # Recently watered
+        days_until = interval - days_since
+        return (days_since, URGENCY_GREEN, f"Good ({days_until}d left)", -days_since)
 
 # --- MASSIVE EXPLOSION OVERLAY ---
 class ExplosionOverlay(Widget):
@@ -317,6 +368,168 @@ class SkippedPlantsLogViewer(FloatLayout):
         except Exception as e:
             return f"[color=FF6B6B]Error loading log: {e}[/color]"
 
+# --- STATISTICS DASHBOARD ---
+class StatisticsDashboard(FloatLayout):
+    def __init__(self, log_file, on_close, **kwargs):
+        super().__init__(**kwargs)
+
+        with self.canvas.before:
+            Color(*NAVY)
+            Rectangle(size=Window.size, pos=(0, 0))
+
+        with self.canvas.before:
+            Color(*GOLD)
+            Rectangle(size=(Window.width, 100), pos=(0, Window.height - 100))
+
+        title = Label(
+            text="Watering Statistics",
+            font_size='30sp',
+            bold=True,
+            color=NAVY,
+            size_hint=(0.9, None),
+            height=80,
+            text_size=(Window.width * 0.9, None),
+            halign='center',
+            valign='middle',
+            pos_hint={'center_x': 0.5, 'top': 0.98}
+        )
+        self.add_widget(title)
+
+        close_btn = Button(
+            text="X Close",
+            size_hint=(0.3, 0.08),
+            pos_hint={'center_x': 0.5, 'y': 0.02},
+            background_color=DEEP_GREEN,
+            font_size='22sp',
+            bold=True,
+            color=CREAM
+        )
+        close_btn.bind(on_release=lambda x: on_close())
+        self.add_widget(close_btn)
+
+        stats_text = self.calculate_stats(log_file)
+
+        stats_label = Label(
+            text=stats_text,
+            font_size='18sp',
+            color=CREAM,
+            size_hint_y=None,
+            text_size=(Window.width * 0.9, None),
+            halign='left',
+            valign='top',
+            markup=True
+        )
+        stats_label.bind(texture_size=stats_label.setter('size'))
+
+        scroll = ScrollView(
+            size_hint=(0.95, 0.75),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5}
+        )
+        scroll.add_widget(stats_label)
+        self.add_widget(scroll)
+
+    def calculate_stats(self, log_file):
+        if not os.path.exists(log_file):
+            return "[color=FFD700][b]No watering history yet[/b][/color]\n\nStart watering plants to see your statistics!"
+
+        try:
+            with open(log_file, "r") as f:
+                lines = f.readlines()
+
+            if not lines:
+                return "[color=FFD700][b]No watering history yet[/b][/color]"
+
+            now = datetime.datetime.now()
+            week_ago = now - datetime.timedelta(days=7)
+            month_ago = now - datetime.timedelta(days=30)
+
+            # Count watering events
+            week_watered = 0
+            month_watered = 0
+            total_watered = 0
+            week_skipped = 0
+
+            # Track daily activity
+            daily_counts = {}
+
+            # Calculate streak
+            days_with_watering = set()
+
+            for line in lines:
+                try:
+                    date_str = line.split(']')[0].strip('[')
+                    log_date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+                    date_only = log_date.date()
+
+                    if "WATERED" in line:
+                        total_watered += 1
+                        days_with_watering.add(date_only)
+
+                        if log_date >= week_ago:
+                            week_watered += 1
+                            # Daily counts for last 7 days
+                            day_str = log_date.strftime("%a %m/%d")
+                            daily_counts[day_str] = daily_counts.get(day_str, 0) + 1
+
+                        if log_date >= month_ago:
+                            month_watered += 1
+
+                    if "SKIPPED" in line and log_date >= week_ago:
+                        week_skipped += 1
+                except:
+                    continue
+
+            # Calculate current streak
+            streak = 0
+            check_date = now.date()
+            while check_date in days_with_watering:
+                streak += 1
+                check_date -= datetime.timedelta(days=1)
+
+            # Calculate completion rates by room
+            kitchen_total = len([p for p in PLANT_DECK_MASTER if p['room'] == 'Kitchen'])
+            office_total = len([p for p in PLANT_DECK_MASTER if p['room'] == 'Office'])
+            bedroom_total = len([p for p in PLANT_DECK_MASTER if p['room'] == 'Bedroom'])
+
+            kitchen_watered = sum(1 for p in PLANT_DECK_MASTER if p['room'] == 'Kitchen' and get_last_watered_date(p['name'], log_file) and (now - get_last_watered_date(p['name'], log_file)).days <= 7)
+            office_watered = sum(1 for p in PLANT_DECK_MASTER if p['room'] == 'Office' and get_last_watered_date(p['name'], log_file) and (now - get_last_watered_date(p['name'], log_file)).days <= 7)
+            bedroom_watered = sum(1 for p in PLANT_DECK_MASTER if p['room'] == 'Bedroom' and get_last_watered_date(p['name'], log_file) and (now - get_last_watered_date(p['name'], log_file)).days <= 7)
+
+            kitchen_pct = int((kitchen_watered / kitchen_total) * 100) if kitchen_total > 0 else 0
+            office_pct = int((office_watered / office_total) * 100) if office_total > 0 else 0
+            bedroom_pct = int((bedroom_watered / bedroom_total) * 100) if bedroom_total > 0 else 0
+
+            # Format output
+            output = []
+            output.append("[color=FFD700][size=24sp][b]Overview[/b][/size][/color]\n")
+            output.append(f"[color=90EE90]Total plants watered: {total_watered}[/color]")
+            output.append(f"[color=90EE90]This week: {week_watered} watered, {week_skipped} skipped[/color]")
+            output.append(f"[color=90EE90]This month: {month_watered} watered[/color]\n")
+
+            output.append(f"[color=FFD700][size=24sp][b]Current Streak[/b][/size][/color]")
+            if streak > 0:
+                output.append(f"[color=90EE90][b]{streak} day{'s' if streak != 1 else ''}[/b] of consecutive watering![/color]\n")
+            else:
+                output.append(f"[color=FFA07A]No current streak - water plants today![/color]\n")
+
+            output.append(f"[color=FFD700][size=24sp][b]Room Completion (This Week)[/b][/size][/color]")
+            output.append(f"[color=90EE90]Kitchen: {kitchen_pct}% ({kitchen_watered}/{kitchen_total} plants)[/color]")
+            output.append(f"[color=90EE90]Office: {office_pct}% ({office_watered}/{office_total} plants)[/color]")
+            output.append(f"[color=90EE90]Bedroom: {bedroom_pct}% ({bedroom_watered}/{bedroom_total} plants)[/color]\n")
+
+            output.append(f"[color=FFD700][size=24sp][b]Daily Activity (Last 7 Days)[/b][/size][/color]")
+            # Show last 7 days
+            for i in range(6, -1, -1):
+                day = now - datetime.timedelta(days=i)
+                day_str = day.strftime("%a %m/%d")
+                count = daily_counts.get(day_str, 0)
+                bar = "=" * count if count > 0 else "-"
+                output.append(f"[color=FFFFFF]{day_str}: {bar} ({count})[/color]")
+
+            return "\n".join(output)
+        except Exception as e:
+            return f"[color=FF6B6B]Error calculating statistics: {e}[/color]"
+
 # --- ROOM SELECTION ---
 class RoomSelectScreen(FloatLayout):
     def __init__(self, on_room_selected, **kwargs):
@@ -408,18 +621,47 @@ class RoomSelectScreen(FloatLayout):
         bedroom_btn.bind(on_release=lambda x: self.select_room("Bedroom"))
         self.add_widget(bedroom_btn)
 
-        # Skipped plants button
-        skipped_btn = Button(
-            text="SKIPPED PLANTS",
-            font_size='20sp',
+        # WATER ALL button (Quick Action Mode) - most prominent
+        water_all_btn = Button(
+            text="WATER ALL",
+            font_size='24sp',
             bold=True,
-            size_hint=(0.6, 0.10),
-            pos_hint={'center_x': 0.5, 'center_y': 0.12},
+            size_hint=(0.75, 0.12),
+            pos_hint={'center_x': 0.5, 'center_y': 0.15},
+            background_color=URGENCY_RED,
+            color=CREAM
+        )
+        water_all_btn.bind(on_release=lambda x: self.on_room_selected("__QUICK_ACTION__"))
+        self.add_widget(water_all_btn)
+
+        # Bottom row: Skipped Plants and Statistics
+        skipped_btn = Button(
+            text="SKIPPED\nPLANTS",
+            font_size='16sp',
+            bold=True,
+            size_hint=(0.35, 0.10),
+            pos_hint={'x': 0.08, 'y': 0.02},
             background_color=LIGHT_GOLD,
-            color=NAVY
+            color=NAVY,
+            halign='center',
+            valign='middle'
         )
         skipped_btn.bind(on_release=lambda x: self.on_room_selected("__SKIPPED__"))
         self.add_widget(skipped_btn)
+
+        stats_btn = Button(
+            text="STATISTICS",
+            font_size='16sp',
+            bold=True,
+            size_hint=(0.35, 0.10),
+            pos_hint={'x': 0.57, 'y': 0.02},
+            background_color=DEEP_GREEN,
+            color=CREAM,
+            halign='center',
+            valign='middle'
+        )
+        stats_btn.bind(on_release=lambda x: self.on_room_selected("__STATS__"))
+        self.add_widget(stats_btn)
 
     def select_room(self, room):
         # Stop welcome sound
@@ -431,7 +673,7 @@ class RoomSelectScreen(FloatLayout):
 
 # --- PLANT CARD WITH VISIBLE INSTRUCTIONS ---
 class PlantCard(FloatLayout):
-    def __init__(self, plant_info, on_swipe_callback, **kwargs):
+    def __init__(self, plant_info, on_swipe_callback, urgency_info=None, **kwargs):
         super().__init__(**kwargs)
         self.plant_info = plant_info
         self.on_swipe_callback = on_swipe_callback
@@ -450,6 +692,35 @@ class PlantCard(FloatLayout):
             Color(*GOLD)
             Rectangle(size=(Window.width * 0.92, 5), pos=(Window.width * 0.04, Window.height * 0.89 - 5))
             Rectangle(size=(Window.width * 0.92, 5), pos=(Window.width * 0.04, Window.height * 0.11))
+
+        # Urgency badge (top-right corner)
+        if urgency_info:
+            days_since, urgency_color, urgency_text, urgency_score = urgency_info
+
+            # Badge background
+            badge_bg = Widget()
+            with badge_bg.canvas:
+                Color(*urgency_color)
+                Rectangle(
+                    size=(Window.width * 0.35, 50),
+                    pos=(Window.width * 0.59, Window.height * 0.82)
+                )
+            self.add_widget(badge_bg)
+
+            # Badge text
+            badge_label = Label(
+                text=urgency_text,
+                font_size='16sp',
+                bold=True,
+                color=(1, 1, 1, 1),  # White text
+                size_hint=(None, None),
+                size=(Window.width * 0.35, 50),
+                pos=(Window.width * 0.59, Window.height * 0.82),
+                text_size=(Window.width * 0.33, None),
+                halign='center',
+                valign='middle'
+            )
+            self.add_widget(badge_label)
 
         # Plant image
         try:
@@ -530,9 +801,12 @@ class PlantsTheGameApp(App):
         self.card = None
         self.log_viewer = None
         self.skipped_viewer = None
+        self.stats_viewer = None
         self.menu_btn = None
         self.reset_btn = None
         self.instruction_label = None
+        self.quick_action_total = 0  # Track total plants in quick action mode
+        self.quick_action_watered = 0  # Track plants watered in quick action mode
 
         with self.root.canvas.before:
             Color(*NAVY)
@@ -591,10 +865,45 @@ class PlantsTheGameApp(App):
         self.root.add_widget(self.menu_btn)
         self.root.add_widget(self.reset_btn)
 
-    def start_gameplay(self, room):
+    def start_gameplay(self, room, filter_overdue=False):
         # Special case: Show skipped plants log
         if room == "__SKIPPED__":
             self.show_skipped_plants()
+            return
+
+        # Special case: Show statistics
+        if room == "__STATS__":
+            self.show_statistics()
+            return
+
+        # Special case: Quick Action Mode (all overdue plants)
+        if room == "__QUICK_ACTION__":
+            self.current_room = "Quick Action"
+            if self.bg_music and self.bg_music.state != 'play':
+                self.bg_music.play()
+
+            # Get ALL plants, filter for overdue
+            all_plants = list(PLANT_DECK_MASTER)
+            overdue_plants = []
+            for plant in all_plants:
+                urgency = calculate_urgency(plant, self.log_file)
+                if urgency[3] >= 0:  # urgency_score >= 0 means overdue or never watered
+                    overdue_plants.append(plant)
+
+            self.deck = overdue_plants
+            self.quick_action_total = len(overdue_plants)
+            self.quick_action_watered = 0
+
+            self.root.clear_widgets()
+            self.root.add_widget(self.menu_btn)
+            self.root.add_widget(self.reset_btn)
+
+            if not self.deck:
+                # No overdue plants!
+                self.show_no_overdue_message()
+                return
+
+            self.load_next_card()
             return
 
         self.current_room = room
@@ -603,6 +912,9 @@ class PlantsTheGameApp(App):
             self.bg_music.play()
 
         self.deck = [p for p in PLANT_DECK_MASTER if p['room'] == room]
+
+        # Sort deck by urgency (most urgent first)
+        self.deck = sorted(self.deck, key=lambda p: calculate_urgency(p, self.log_file)[3], reverse=True)
 
         self.root.clear_widgets()
         self.root.add_widget(self.menu_btn)
@@ -619,6 +931,23 @@ class PlantsTheGameApp(App):
         except Exception as e:
             print(f"Could not load {sound_file}: {e}")
 
+    def show_no_overdue_message(self):
+        """Show message when no plants need watering"""
+        msg_label = Label(
+            text="All plants are watered!\n\nGreat job!",
+            font_size='36sp',
+            bold=True,
+            color=GOLD,
+            size_hint=(0.9, None),
+            height=200,
+            text_size=(Window.width * 0.9, None),
+            halign='center',
+            valign='middle',
+            pos_hint={'center_x': 0.5, 'center_y': 0.5}
+        )
+        self.root.add_widget(msg_label)
+        Clock.schedule_once(lambda dt: self.show_room_selection(), 3)
+
     def show_skipped_plants(self):
         """Show skipped plants log viewer"""
         self.root.clear_widgets()
@@ -633,6 +962,22 @@ class PlantsTheGameApp(App):
         if self.skipped_viewer:
             self.root.remove_widget(self.skipped_viewer)
             self.skipped_viewer = None
+        self.show_room_selection()
+
+    def show_statistics(self):
+        """Show statistics dashboard"""
+        self.root.clear_widgets()
+        self.stats_viewer = StatisticsDashboard(self.log_file, self.close_statistics)
+        self.root.add_widget(self.stats_viewer)
+        # Add buttons on top
+        self.root.add_widget(self.menu_btn)
+        self.root.add_widget(self.reset_btn)
+
+    def close_statistics(self):
+        """Close statistics viewer and return to room selection"""
+        if self.stats_viewer:
+            self.root.remove_widget(self.stats_viewer)
+            self.stats_viewer = None
         self.show_room_selection()
 
     def toggle_log_viewer(self, *args):
@@ -678,6 +1023,10 @@ class PlantsTheGameApp(App):
         if action == "WATERED":
             self.vibrate(0.05)
             self.skip_streak = 0
+
+            # Track quick action watering
+            if self.current_room == "Quick Action":
+                self.quick_action_watered += 1
 
             # Play watered sound
             if 'llama' in plant_info['name'].lower():
@@ -744,7 +1093,9 @@ class PlantsTheGameApp(App):
     def load_next_card(self):
         if self.deck:
             plant = self.deck.pop(0)
-            self.card = PlantCard(plant, self.handle_swipe)
+            # Calculate urgency for this plant
+            urgency_info = calculate_urgency(plant, self.log_file)
+            self.card = PlantCard(plant, self.handle_swipe, urgency_info=urgency_info)
             self.root.add_widget(self.card)
 
             # Add instruction label above card on navy background
@@ -777,8 +1128,14 @@ class PlantsTheGameApp(App):
             # Play explosion sound
             self.play_sound('explosion.mp3')
 
+            # Special message for Quick Action mode
+            if self.current_room == "Quick Action":
+                msg_text = f"{self.quick_action_watered} plants watered!\n\nGreat job!"
+            else:
+                msg_text = f"{self.current_room}\nCOMPLETE!"
+
             completion_msg = Label(
-                text=f"{self.current_room}\nCOMPLETE!",
+                text=msg_text,
                 font_size='40sp',
                 bold=True,
                 color=GOLD,
@@ -799,6 +1156,8 @@ class PlantsTheGameApp(App):
         self.skip_streak = 0
         self.deck = []
         self.current_room = None
+        self.quick_action_total = 0
+        self.quick_action_watered = 0
         if self.card:
             try:
                 self.root.remove_widget(self.card)
@@ -820,6 +1179,12 @@ class PlantsTheGameApp(App):
             try:
                 self.root.remove_widget(self.skipped_viewer)
                 self.skipped_viewer = None
+            except:
+                pass
+        if self.stats_viewer:
+            try:
+                self.root.remove_widget(self.stats_viewer)
+                self.stats_viewer = None
             except:
                 pass
         self.show_room_selection()
