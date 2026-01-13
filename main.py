@@ -147,7 +147,7 @@ class LogViewer(FloatLayout):
             Rectangle(size=(Window.width, 100), pos=(0, Window.height - 100))
 
         title = Label(
-            text="📋 Watering Log",
+            text="Watering Log",
             font_size='30sp',
             bold=True,
             color=NAVY,
@@ -161,7 +161,7 @@ class LogViewer(FloatLayout):
         self.add_widget(title)
 
         close_btn = Button(
-            text="✕ Close",
+            text="X Close",
             size_hint=(0.3, 0.08),
             pos_hint={'center_x': 0.5, 'y': 0.02},
             background_color=DEEP_GREEN,
@@ -217,6 +217,106 @@ class LogViewer(FloatLayout):
         except Exception as e:
             return f"[color=FF6B6B]Error loading log: {e}[/color]"
 
+# --- SKIPPED PLANTS LOG VIEWER ---
+class SkippedPlantsLogViewer(FloatLayout):
+    def __init__(self, log_file, on_close, **kwargs):
+        super().__init__(**kwargs)
+
+        with self.canvas.before:
+            Color(*NAVY)
+            Rectangle(size=Window.size, pos=(0, 0))
+
+        with self.canvas.before:
+            Color(*GOLD)
+            Rectangle(size=(Window.width, 100), pos=(0, Window.height - 100))
+
+        title = Label(
+            text="Skipped Plants (Last 7 Days)",
+            font_size='28sp',
+            bold=True,
+            color=NAVY,
+            size_hint=(0.9, None),
+            height=80,
+            text_size=(Window.width * 0.9, None),
+            halign='center',
+            valign='middle',
+            pos_hint={'center_x': 0.5, 'top': 0.98}
+        )
+        self.add_widget(title)
+
+        close_btn = Button(
+            text="X Close",
+            size_hint=(0.3, 0.08),
+            pos_hint={'center_x': 0.5, 'y': 0.02},
+            background_color=DEEP_GREEN,
+            font_size='22sp',
+            bold=True,
+            color=CREAM
+        )
+        close_btn.bind(on_release=lambda x: on_close())
+        self.add_widget(close_btn)
+
+        log_text = self.load_skipped_plants(log_file)
+
+        log_label = Label(
+            text=log_text,
+            font_size='18sp',
+            color=CREAM,
+            size_hint_y=None,
+            text_size=(Window.width * 0.9, None),
+            halign='left',
+            valign='top',
+            markup=True
+        )
+        log_label.bind(texture_size=log_label.setter('size'))
+
+        scroll = ScrollView(
+            size_hint=(0.95, 0.75),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5}
+        )
+        scroll.add_widget(log_label)
+        self.add_widget(scroll)
+
+    def load_skipped_plants(self, log_file):
+        if not os.path.exists(log_file):
+            return "[color=FFD700][b]No watering history yet[/b][/color]\n\nStart watering plants to see skipped plants!"
+
+        try:
+            with open(log_file, "r") as f:
+                lines = f.readlines()
+                if not lines:
+                    return "[color=FFD700][b]No watering history yet[/b][/color]"
+
+                # Get current date
+                now = datetime.datetime.now()
+                seven_days_ago = now - datetime.timedelta(days=7)
+
+                # Filter for skipped plants in last 7 days
+                skipped_lines = []
+                for line in lines:
+                    if "SKIPPED" in line:
+                        try:
+                            # Parse date from line: [YYYY-MM-DD HH:MM]
+                            date_str = line.split(']')[0].strip('[')
+                            log_date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+                            if log_date >= seven_days_ago:
+                                skipped_lines.append(line)
+                        except:
+                            # If date parsing fails, include it anyway
+                            skipped_lines.append(line)
+
+                if not skipped_lines:
+                    return "[color=90EE90][b]No plants skipped in the last 7 days![/b][/color]\n\nGreat job!"
+
+                skipped_lines.reverse()  # Most recent first
+                formatted = []
+                for line in skipped_lines:
+                    formatted.append(f"[color=FFA07A]{line.strip()}[/color]")
+
+                return "\n".join(formatted)
+        except Exception as e:
+            return f"[color=FF6B6B]Error loading log: {e}[/color]"
+
 # --- ROOM SELECTION ---
 class RoomSelectScreen(FloatLayout):
     def __init__(self, on_room_selected, **kwargs):
@@ -264,7 +364,7 @@ class RoomSelectScreen(FloatLayout):
         self.add_widget(subtitle)
 
         kitchen_btn = Button(
-            text="🌿 Kitchen",
+            text="Kitchen",
             font_size='28sp',
             bold=True,
             size_hint=(0.75, 0.12),
@@ -279,7 +379,7 @@ class RoomSelectScreen(FloatLayout):
         self.add_widget(kitchen_btn)
 
         office_btn = Button(
-            text="💼 Office",
+            text="Office",
             font_size='28sp',
             bold=True,
             size_hint=(0.75, 0.12),
@@ -294,7 +394,7 @@ class RoomSelectScreen(FloatLayout):
         self.add_widget(office_btn)
 
         bedroom_btn = Button(
-            text="🛏️ Bedroom",
+            text="Bedroom",
             font_size='28sp',
             bold=True,
             size_hint=(0.75, 0.12),
@@ -308,25 +408,26 @@ class RoomSelectScreen(FloatLayout):
         bedroom_btn.bind(on_release=lambda x: self.select_room("Bedroom"))
         self.add_widget(bedroom_btn)
 
+        # Skipped plants button
+        skipped_btn = Button(
+            text="SKIPPED PLANTS",
+            font_size='20sp',
+            bold=True,
+            size_hint=(0.6, 0.10),
+            pos_hint={'center_x': 0.5, 'center_y': 0.12},
+            background_color=LIGHT_GOLD,
+            color=NAVY
+        )
+        skipped_btn.bind(on_release=lambda x: self.on_room_selected("__SKIPPED__"))
+        self.add_widget(skipped_btn)
+
     def select_room(self, room):
         # Stop welcome sound
         if self.welcome_sound:
             self.welcome_sound.stop()
 
-        # Play room sound
-        sound_file = f"{room.lower()}.mp3"
-        try:
-            room_sound = SoundLoader.load(os.path.join("assets", "audio", sound_file))
-            if room_sound:
-                room_sound.play()
-                # Wait for audio to finish (or at least 5 seconds)
-                Clock.schedule_once(lambda dt: self.on_room_selected(room), 5)
-            else:
-                # No audio, proceed immediately
-                self.on_room_selected(room)
-        except Exception as e:
-            print(f"Could not load {sound_file}: {e}")
-            self.on_room_selected(room)
+        # Open room immediately, sound will play after room loads
+        self.on_room_selected(room)
 
 # --- PLANT CARD WITH VISIBLE INSTRUCTIONS ---
 class PlantCard(FloatLayout):
@@ -349,30 +450,6 @@ class PlantCard(FloatLayout):
             Color(*GOLD)
             Rectangle(size=(Window.width * 0.92, 5), pos=(Window.width * 0.04, Window.height * 0.89 - 5))
             Rectangle(size=(Window.width * 0.92, 5), pos=(Window.width * 0.04, Window.height * 0.11))
-
-        # PROMINENT INSTRUCTIONS - Make them unmissable!
-        instructions_bg = Widget()
-        with instructions_bg.canvas.before:
-            Color(*GOLD)
-            Rectangle(
-                size=(Window.width * 0.92, 70),
-                pos=(Window.width * 0.04, Window.height * 0.89 - 75)
-            )
-        self.add_widget(instructions_bg)
-
-        instructions = Label(
-            text="⬅️ SWIPE LEFT = WATER  |  SWIPE RIGHT = SKIP ➡️",
-            font_size='18sp',
-            color=NAVY,
-            bold=True,
-            size_hint=(0.9, None),
-            height=60,
-            text_size=(Window.width * 0.85, None),
-            halign='center',
-            valign='middle',
-            pos_hint={'center_x': 0.5, 'center_y': 0.90}
-        )
-        self.add_widget(instructions)
 
         # Plant image
         try:
@@ -404,7 +481,7 @@ class PlantCard(FloatLayout):
 
         # Room label
         self.add_widget(Label(
-            text=f"📍 {plant_info['room']}",
+            text=f"Room: {plant_info['room']}",
             font_size='20sp',
             color=GOLD,
             bold=True,
@@ -452,8 +529,10 @@ class PlantsTheGameApp(App):
         self.skip_streak = 0
         self.card = None
         self.log_viewer = None
+        self.skipped_viewer = None
         self.menu_btn = None
         self.reset_btn = None
+        self.instruction_label = None
 
         with self.root.canvas.before:
             Color(*NAVY)
@@ -480,26 +559,26 @@ class PlantsTheGameApp(App):
         """Create hamburger menu and reset button that persist"""
         # Hamburger menu
         self.menu_btn = Button(
-            text="☰",
+            text="MENU",
             size_hint=(None, None),
-            size=(70, 70),
+            size=(80, 70),
             pos=(10, Window.height - 80),
             background_color=GOLD,
             color=NAVY,
-            font_size='36sp',
+            font_size='18sp',
             bold=True
         )
         self.menu_btn.bind(on_release=self.toggle_log_viewer)
 
         # Reset button
         self.reset_btn = Button(
-            text="🔄 Reset",
+            text="Reset",
             size_hint=(None, None),
-            size=(120, 70),
-            pos=(Window.width - 130, Window.height - 80),
+            size=(80, 70),
+            pos=(Window.width - 90, Window.height - 80),
             background_color=DEEP_GREEN,
             color=CREAM,
-            font_size='20sp',
+            font_size='18sp',
             bold=True
         )
         self.reset_btn.bind(on_release=self.reset_to_room_selection)
@@ -513,6 +592,11 @@ class PlantsTheGameApp(App):
         self.root.add_widget(self.reset_btn)
 
     def start_gameplay(self, room):
+        # Special case: Show skipped plants log
+        if room == "__SKIPPED__":
+            self.show_skipped_plants()
+            return
+
         self.current_room = room
 
         if self.bg_music and self.bg_music.state != 'play':
@@ -525,6 +609,31 @@ class PlantsTheGameApp(App):
         self.root.add_widget(self.reset_btn)
 
         self.load_next_card()
+
+        # Play room intro sound AFTER room is loaded and visible
+        sound_file = f"{room.lower()}.mp3"
+        try:
+            room_sound = SoundLoader.load(os.path.join("assets", "audio", sound_file))
+            if room_sound:
+                room_sound.play()
+        except Exception as e:
+            print(f"Could not load {sound_file}: {e}")
+
+    def show_skipped_plants(self):
+        """Show skipped plants log viewer"""
+        self.root.clear_widgets()
+        self.skipped_viewer = SkippedPlantsLogViewer(self.log_file, self.close_skipped_viewer)
+        self.root.add_widget(self.skipped_viewer)
+        # Add buttons on top
+        self.root.add_widget(self.menu_btn)
+        self.root.add_widget(self.reset_btn)
+
+    def close_skipped_viewer(self):
+        """Close skipped plants viewer and return to room selection"""
+        if self.skipped_viewer:
+            self.root.remove_widget(self.skipped_viewer)
+            self.skipped_viewer = None
+        self.show_room_selection()
 
     def toggle_log_viewer(self, *args):
         if self.log_viewer:
@@ -558,14 +667,17 @@ class PlantsTheGameApp(App):
 
         action = "WATERED" if direction == "left" else "SKIPPED"
 
+        # Log it
+        try:
+            with open(self.log_file, "a") as f:
+                t = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                f.write(f"[{t}] {plant_info['name']}: {action}\n")
+        except Exception as e:
+            print(f"Error writing log: {e}")
+
         if action == "WATERED":
             self.vibrate(0.05)
             self.skip_streak = 0
-
-            # MASSIVE JAKE ICON - added last so it's on top!
-            jake = JakeIcon()
-            self.root.add_widget(jake)
-            jake.animate_in_and_out()
 
             # Play watered sound
             if 'llama' in plant_info['name'].lower():
@@ -577,18 +689,16 @@ class PlantsTheGameApp(App):
             self.skip_streak += 1
             self.play_sound('skipped.mp3')
 
-        # Log it
-        try:
-            with open(self.log_file, "a") as f:
-                t = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-                f.write(f"[{t}] {plant_info['name']}: {action}\n")
-        except Exception as e:
-            print(f"Error writing log: {e}")
-
         if self.skip_streak >= 3:
             self.trigger_boss_level()
         else:
             self.load_next_card()
+
+            # Add jake icon AFTER next card is loaded so it appears on top
+            if action == "WATERED":
+                jake = JakeIcon()
+                self.root.add_widget(jake)
+                jake.animate_in_and_out()
 
     def play_sound(self, filename):
         try:
@@ -603,7 +713,7 @@ class PlantsTheGameApp(App):
             self.bg_music.stop()
 
         self.boss = Button(
-            text="💀 BOSS LEVEL! 💀\n\nYou skipped 3 plants!\n\nTap to continue",
+            text="BOSS LEVEL!\n\nYou skipped 3 plants!\n\nTap to continue",
             background_color=(0.85, 0.1, 0.1, 0.97),
             font_size='32sp',
             bold=True,
@@ -636,6 +746,24 @@ class PlantsTheGameApp(App):
             plant = self.deck.pop(0)
             self.card = PlantCard(plant, self.handle_swipe)
             self.root.add_widget(self.card)
+
+            # Add instruction label above card on navy background
+            if self.instruction_label:
+                self.root.remove_widget(self.instruction_label)
+            self.instruction_label = Label(
+                text="Swipe left to water, right to wait",
+                font_size='20sp',
+                color=CREAM,
+                bold=True,
+                size_hint=(None, None),
+                size=(Window.width * 0.9, 50),
+                text_size=(Window.width * 0.9, None),
+                halign='center',
+                valign='middle',
+                pos=(Window.width * 0.05, Window.height * 0.91)
+            )
+            self.root.add_widget(self.instruction_label)
+
             # Ensure buttons stay on top
             self.root.remove_widget(self.menu_btn)
             self.root.remove_widget(self.reset_btn)
@@ -650,7 +778,7 @@ class PlantsTheGameApp(App):
             self.play_sound('explosion.mp3')
 
             completion_msg = Label(
-                text=f"🎉 {self.current_room}\nCOMPLETE! 🎉",
+                text=f"{self.current_room}\nCOMPLETE!",
                 font_size='40sp',
                 bold=True,
                 color=GOLD,
@@ -676,10 +804,22 @@ class PlantsTheGameApp(App):
                 self.root.remove_widget(self.card)
             except:
                 pass
+        if self.instruction_label:
+            try:
+                self.root.remove_widget(self.instruction_label)
+                self.instruction_label = None
+            except:
+                pass
         if self.log_viewer:
             try:
                 self.root.remove_widget(self.log_viewer)
                 self.log_viewer = None
+            except:
+                pass
+        if self.skipped_viewer:
+            try:
+                self.root.remove_widget(self.skipped_viewer)
+                self.skipped_viewer = None
             except:
                 pass
         self.show_room_selection()
